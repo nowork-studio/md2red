@@ -75,7 +75,7 @@ python3 md2red.py input.md --theme xiaohongshu
 
 ### 进一步探索
 
-欢迎通过超级链接 [访问我们的 GitHub 仓库 (假设)](https://github.com/md2red/md2red) 来提交 Pull Request。
+欢迎通过超级链接 [访问我们的 GitHub 仓库](https://github.com/nowork-studio/md2red) 来提交 Pull Request。
 
 ![md2red Placeholder Image 示意图](https://via.placeholder.com/800x400/eeeeee/333333?text=Markdown+to+RedBook+Cards)
 
