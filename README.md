@@ -13,7 +13,7 @@
 
 1. 克隆本项目到本地：
     ```bash
-    git clone https://github.com/your-username/md2red.git
+    git clone https://github.com/nowork-studio/md2red.git
     cd md2red
     ```
 
