@@ -67,8 +67,8 @@ class StyleManager:
         "notion": ThemeConfig(
             name="Notion Minimal",
             primary_color="#000000",
-            secondary_color="#2F3437",
-            text_color="#37352F",
+            secondary_color="#000000",
+            text_color="#000000",
             background="#F9F8F4",
             font_family='"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Apple Color Emoji", sans-serif',
             heading_font='"Inter", -apple-system, sans-serif',
@@ -87,6 +87,42 @@ class StyleManager:
             code_font='"SF Mono", "Monaco", "Inconsolata", monospace',
             accent_color="#95EC69",
             link_color="#576B95"
+        ),
+        "claude": ThemeConfig(
+            name="Claude",
+            primary_color="#000000",
+            secondary_color="#000000",
+            text_color="#000000",
+            background="linear-gradient(135deg, #FEF3E2 0%, #FDE8CD 50%, #FCE0B8 100%)",
+            font_family='"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Apple Color Emoji", sans-serif',
+            heading_font='"Inter", -apple-system, sans-serif',
+            code_font='"JetBrains Mono", "Cascadia Code", "Consolas", monospace',
+            accent_color="#F59E0B",
+            link_color="#B45309"
+        ),
+        "red_premium": ThemeConfig(
+            name="RED Premium",
+            primary_color="#C84B31",
+            secondary_color="#1A1A1A",
+            text_color="#1A1A1A",
+            background="linear-gradient(180deg, #FFFAF5 0%, #FFF5ED 100%)",
+            font_family='"PingFang SC", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Microsoft YaHei", "Apple Color Emoji", "Segoe UI Emoji", sans-serif',
+            heading_font='"PingFang SC", "Helvetica Neue", sans-serif',
+            code_font='"JetBrains Mono", "Cascadia Code", monospace',
+            accent_color="#D4A574",
+            link_color="#C84B31"
+        ),
+        "reliable": ThemeConfig(
+            name="Reliable",
+            primary_color="#1B3A5C",
+            secondary_color="#1B3A5C",
+            text_color="#1A1A1A",
+            background="#FFFFFF",
+            font_family='"PingFang SC", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Microsoft YaHei", "Apple Color Emoji", sans-serif',
+            heading_font='"PingFang SC", "Helvetica Neue", sans-serif',
+            code_font='"JetBrains Mono", "Cascadia Code", monospace',
+            accent_color="#3D6A99",
+            link_color="#1B3A5C"
         ),
         "million_dollar": ThemeConfig(
             name="Million Dollar",
@@ -129,14 +165,7 @@ class StyleManager:
         is_dark = theme_name in ["dark_mode", "midnight", "douyin", "million_dollar"]
         
         # Theme-specific adjustments
-        card_styles = f"background: {'rgba(255, 255, 255, 0.95)' if not is_dark else 'rgba(20, 20, 35, 0.95)'};"
         if theme_name == "million_dollar":
-            card_styles = """
-                background: rgba(30, 30, 30, 0.8);
-                backdrop-filter: blur(20px);
-                border: 1px solid rgba(255, 215, 0, 0.3);
-                box-shadow: 0 0 50px rgba(255, 215, 0, 0.15), inset 0 0 20px rgba(255, 215, 0, 0.05);
-            """
             typography_styles = """
         h1 {
             font-size: 2.8em;
@@ -252,16 +281,14 @@ class StyleManager:
 
         /* Container for the Card */
         .card-container {{
-            width: 90%;
-            height: 90%;
+            width: 100%;
+            height: 100%;
             position: relative;
         }}
 
         .card {{
             width: 100%;
             height: 100%;
-            {card_styles}
-            border-radius: 40px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -272,7 +299,7 @@ class StyleManager:
 
         .card-content {{
             flex: 1;
-            padding: 80px 60px;
+            padding: 30px 40px;
             overflow: hidden;
             position: relative;
         }}
@@ -313,18 +340,6 @@ class StyleManager:
             box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }}
 
-        /* Pagination Info */
-        .page-info {{
-            position: absolute;
-            bottom: 20px;
-            right: 30px;
-            background: {self.add_alpha(theme.primary_color, 0.1)};
-            color: var(--primary-color);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-        }}
 
         /* Hidden pages */
         .page-container {{ display: none; }}
@@ -426,7 +441,8 @@ class HtmlGenerator:
                         
                         log(`Layout complete. Total Pages: ${pages.length}`);
                         
-                        document.getElementById('page-total').innerText = pages.length;
+                        var pageTotal = document.getElementById('page-total');
+                        if (pageTotal) pageTotal.innerText = pages.length;
                         
                         return JSON.stringify({ count: pages.length, logs: _logs });
                         
@@ -434,6 +450,17 @@ class HtmlGenerator:
                          _logs.push("ERROR: " + e.toString());
                          return JSON.stringify({ count: 1, logs: _logs, error: e.toString() });
                     }
+                }
+
+                function getPageContentHeight() {
+                    var activePage = document.querySelector('.page-container.active');
+                    if (!activePage) return window.innerHeight;
+                    var children = activePage.children;
+                    if (children.length === 0) return window.innerHeight;
+                    var lastChild = children[children.length - 1];
+                    var lastRect = lastChild.getBoundingClientRect();
+                    // Add bottom padding to match visual balance
+                    return Math.ceil(lastRect.bottom) + 30;
                 }
 
                 function showPage(pageIndex) {
@@ -449,7 +476,8 @@ class HtmlGenerator:
                                 p.style.display = 'none'; // Force hidden
                             }
                         });
-                        document.getElementById('page-current').innerText = pageIndex + 1;
+                        var pageCurrent = document.getElementById('page-current');
+                        if (pageCurrent) pageCurrent.innerText = pageIndex + 1;
                         
                         // We use a global variable to track when paint is complete
                         window._paintedPage = -1;
@@ -485,9 +513,6 @@ class HtmlGenerator:
                     <div id="render-target" class="card-content">
                         <!-- Content will be injected here by JS -->
                     </div>
-                    <div class="page-info">
-                        <span id="page-current">1</span> / <span id="page-total">1</span>
-                    </div>
                 </div>
             </div>
 
@@ -516,8 +541,10 @@ class PlaywrightRenderer:
         with sync_playwright() as p:
             # Launch hidden chromium instance
             browser = p.chromium.launch(headless=True)
+            # Enforce 3:4 aspect ratio for viewport
+            viewport_height = int(self.width * 4 / 3)
             page = browser.new_page(
-                viewport={"width": self.width, "height": self.height},
+                viewport={"width": self.width, "height": viewport_height},
                 device_scale_factor=1  # 1:1 exact pixel rendering
             )
             
@@ -538,12 +565,15 @@ class PlaywrightRenderer:
                 page_count = 1
                 
             print(f"Generating {page_count} pages...")
-            
+
+            # Enforce 3:4 aspect ratio
+            clip_height = int(self.width * 4 / 3)
+            print(f"Uniform page height: {clip_height}px (3:4 aspect ratio)")
+
+            # Second pass: screenshot each page at the uniform height
             for i in range(page_count):
                 print(f"Rendering Page {i+1}/{page_count}...")
-                
-                # Tell JS to show the page, and wait a frame sequentially using JS Promises 
-                # instead of arbitrary Python sleep locks.
+
                 page.evaluate(f'''() => {{
                     return new Promise((resolve) => {{
                         showPage({i});
@@ -552,12 +582,11 @@ class PlaywrightRenderer:
                         }});
                     }});
                 }}''')
-                
-                # Take precise deterministic screenshot mapping purely to the painted dimensions
+
                 outfile = output_dir / f"{i+1}.png"
                 page.screenshot(
-                    path=str(outfile), 
-                    clip={"x": 0, "y": 0, "width": self.width, "height": self.height}
+                    path=str(outfile),
+                    clip={"x": 0, "y": 0, "width": self.width, "height": clip_height}
                 )
                 print(f"Saved: {outfile}")
                 
@@ -571,7 +600,7 @@ class PlaywrightRenderer:
 def main():
     parser = argparse.ArgumentParser(description="Convert Markdown to Social Media Cards (RedBook Style)")
     parser.add_argument("input", help="Input Markdown file")
-    parser.add_argument("--theme", default="million_dollar", help="Theme name (xiaohongshu, dark_mode, wechat, notion, million_dollar)")
+    parser.add_argument("--theme", default="claude", help="Theme name (xiaohongshu, dark_mode, wechat, notion, claude, red_premium, reliable, million_dollar)")
     parser.add_argument("--output", help="Output title/folder name (default: input filename stem)")
     parser.add_argument("--width", type=int, default=1080, help="Image width (default: 1080)")
     parser.add_argument("--height", type=int, default=1440, help="Image height (default: 1440)")
